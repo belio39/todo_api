@@ -100,11 +100,39 @@ export const updateUser: RequestHandler<{ id: string }> = async (req, res) => {
       .execute("updateUser");
 
     res.status(200).json({
-      message: "Todo Successfully Updated",
+      message: "User Successfully Updated",
     });
   } catch (error: any) {
     res.json({
       error: error.message,
     });
+  }
+};
+
+interface RequestExtended extends Request {
+  users?: any;
+}
+
+export const deleteUser = async (req: RequestExtended, res: Response) => {
+  try {
+    const id = req.params.id;
+    let pool = await mssql.connect(config);
+    const user = await pool
+      .request()
+      .input("id", mssql.VarChar, id)
+      .execute("getSingleUser");
+    if (!user.recordset[0]) {
+      res.json({
+        message: `No user ${id} exist!`,
+      });
+    }
+    await pool.request().input("id", mssql.VarChar, id).execute("deleteUser");
+
+    res.status(200).json({
+      status: "Successfully",
+      message: "User successfully deteled",
+    });
+  } catch (error: any) {
+    res.json({ error: error.message });
   }
 };

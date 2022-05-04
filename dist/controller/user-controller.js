@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.getSingleUser = exports.getUsers = exports.createUser = void 0;
+exports.deleteUser = exports.updateUser = exports.getSingleUser = exports.getUsers = exports.createUser = void 0;
 const uuid_1 = require("uuid");
 const mssql_1 = __importDefault(require("mssql"));
 const config_1 = __importDefault(require("../config/config"));
@@ -101,7 +101,7 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             .input("date", mssql_1.default.VarChar, date)
             .execute("updateUser");
         res.status(200).json({
-            message: "Todo Successfully Updated",
+            message: "User Successfully Updated",
         });
     }
     catch (error) {
@@ -111,3 +111,27 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateUser = updateUser;
+const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.params.id;
+        let pool = yield mssql_1.default.connect(config_1.default);
+        const user = yield pool
+            .request()
+            .input("id", mssql_1.default.VarChar, id)
+            .execute("getSingleUser");
+        if (!user.recordset[0]) {
+            res.json({
+                message: `No user ${id} exist!`,
+            });
+        }
+        yield pool.request().input("id", mssql_1.default.VarChar, id).execute("deleteUser");
+        res.status(200).json({
+            status: "Successfully",
+            message: "User successfully deteled",
+        });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+});
+exports.deleteUser = deleteUser;
