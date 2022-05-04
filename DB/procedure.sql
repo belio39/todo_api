@@ -32,7 +32,7 @@ GO
 CREATE PROCEDURE updateUser(@id VARCHAR(50), @title VARCHAR(50), @description VARCHAR(100), @date VARCHAR(50))
 AS
 BEGIN
-UPDATE Users SET title = @title, description = @description, date = @date
+UPDATE Users SET title = @title, description = @description, date = @date WHERE id=@id
 END
 GO
 
