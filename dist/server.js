@@ -15,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const config_1 = __importDefault(require("./config/config"));
 const mssql_1 = __importDefault(require("mssql"));
+const user_route_1 = __importDefault(require("./routes/user-route"));
 const app = (0, express_1.default)();
-app.get("/", (req, res) => {
-    res.send("dennis");
-});
+app.use(express_1.default.json());
+app.use("/", user_route_1.default);
 const connection = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const conn = yield mssql_1.default.connect(config_1.default);
