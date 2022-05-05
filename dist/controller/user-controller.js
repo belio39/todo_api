@@ -25,7 +25,7 @@ const createTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         let pool = yield mssql_1.default.connect(config_1.default);
         const { error } = use_model_1.Registerschema.validate(req.body);
         if (error) {
-            return res.json({ error: error.details[0].message });
+            return res.status(400).json({ error: error.details[0].message });
         }
         yield pool
             .request()

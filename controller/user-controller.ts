@@ -17,7 +17,7 @@ export const createTodo = async (req: Request, res: Response) => {
     let pool = await mssql.connect(config);
     const { error } = Registerschema.validate(req.body);
     if (error) {
-      return res.json({ error: error.details[0].message });
+      return res.status(400).json({ error: error.details[0].message });
     }
 
     await pool
