@@ -1,44 +1,52 @@
-CREATE OR ALTER PROCEDURE insertUser(
+CREATE OR ALTER PROCEDURE insertTodo(
     @id VARCHAR(50), 
     @title VARCHAR(50), 
     @description VARCHAR(100), 
-    @date VARCHAR(50)
+    @date VARCHAR(50),
+    @start VARCHAR(10)
     )
 AS
 BEGIN
 
-INSERT INTO Users(id,title,description,date)
-VALUES(@id,@title,@description,@date)
+INSERT INTO Todos(id,title,description,date,start)
+VALUES(@id,@title,@description,@date, @start)
 
 END
 GO
 
-CREATE PROCEDURE getUsers
+CREATE PROCEDURE getTodos
 AS
 BEGIN
 
-SELECT id, title, description, date FROM Users
+SELECT * FROM Todos
 END
 GO
 
-CREATE PROCEDURE getSingleUser(@id VARCHAR(50))
+CREATE PROCEDURE getTodo(@id VARCHAR(50))
 AS
 BEGIN
 
-SELECT id, title, description, date FROM Users WHERE id=@id
+SELECT id, title, description, date, start FROM Todos WHERE id=@id
 END
 GO
 
-CREATE PROCEDURE updateUser(@id VARCHAR(50), @title VARCHAR(50), @description VARCHAR(100), @date VARCHAR(50))
+CREATE PROCEDURE updateTodo(@id VARCHAR(50), @title VARCHAR(50), @description VARCHAR(100), @date VARCHAR(50), @start VARCHAR(10))
 AS
 BEGIN
-UPDATE Users SET title = @title, description = @description, date = @date WHERE id=@id
+UPDATE Todos SET title = @title, description = @description, date = @date, start = @start WHERE id=@id
 END
 GO
 
-CREATE PROCEDURE deleteUser(@id VARCHAR(50))
+CREATE PROCEDURE updateCOMPLETE(@id VARCHAR(50), @start VARCHAR(10))
 AS
 BEGIN
-DELETE FROM Users WHERE id = @id
+UPDATE Todos SET start = @start WHERE id=@id
+END
+GO
+
+CREATE PROCEDURE deleteTodo(@id VARCHAR(50))
+AS
+BEGIN
+DELETE FROM Todos WHERE id = @id
 END
 GO

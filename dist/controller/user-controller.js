@@ -12,14 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUser = exports.getSingleUser = exports.getUsers = exports.createUser = void 0;
+exports.deleteTodo = exports.updateTodo = exports.getTodo = exports.getTodos = exports.createTodo = void 0;
 const uuid_1 = require("uuid");
 const mssql_1 = __importDefault(require("mssql"));
 const config_1 = __importDefault(require("../config/config"));
 const use_model_1 = require("../models/use-model");
-const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = (0, uuid_1.v1)();
+        const start = "start";
         const { title, description, date } = req.body;
         let pool = yield mssql_1.default.connect(config_1.default);
         const { error } = use_model_1.Registerschema.validate(req.body);
@@ -32,7 +33,8 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             .input("title", mssql_1.default.VarChar, title)
             .input("description", mssql_1.default.VarChar, description)
             .input("date", mssql_1.default.VarChar, date)
-            .execute("insertUser");
+            .input("start", mssql_1.default.VarChar, start)
+            .execute("insertTodo");
         res.status(200).json({
             message: "User Created Successfully",
         });
@@ -41,56 +43,56 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.json({ error: error.message });
     }
 });
-exports.createUser = createUser;
-const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createTodo = createTodo;
+const getTodos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let pool = yield mssql_1.default.connect(config_1.default);
-        const users = yield pool.request().execute("getUsers");
+        const todos = yield pool.request().execute("getTodos");
         res.status(200).json({
             status: "Success",
-            data: users.recordset,
+            data: todos.recordset,
         });
     }
     catch (error) {
         res.json({ error: error.message });
     }
 });
-exports.getUsers = getUsers;
-const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getTodos = getTodos;
+const getTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
         let pool = yield mssql_1.default.connect(config_1.default);
-        const user = yield pool
+        const todo = yield pool
             .request()
             .input("id", mssql_1.default.VarChar, id)
-            .execute("getSingleUser");
-        if (!user.recordset[0]) {
+            .execute("getTodo");
+        if (!todo.recordset[0]) {
             return res.json({
-                message: `No user with ${id}`,
+                message: `No todo with ${id}`,
             });
         }
         res.status(200).json({
             message: "Success",
-            data: user.recordset,
+            data: todo.recordset,
         });
     }
     catch (error) {
         res.json({ error: error.message });
     }
 });
-exports.getSingleUser = getSingleUser;
-const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getTodo = getTodo;
+const updateTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
         let pool = yield mssql_1.default.connect(config_1.default);
-        const { title, description, date } = req.body;
-        const user = yield pool
+        const { title, description, date, start } = req.body;
+        const todo = yield pool
             .request()
             .input("id", mssql_1.default.VarChar, id)
-            .execute("getSingleUser");
-        if (!user.recordset[0]) {
+            .execute("getTodo");
+        if (!todo.recordset[0]) {
             res.json({
-                message: `No user with ${id}`,
+                message: `No Todo with ${id}`,
             });
         }
         yield pool
@@ -99,9 +101,10 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             .input("title", mssql_1.default.VarChar, title)
             .input("description", mssql_1.default.VarChar, description)
             .input("date", mssql_1.default.VarChar, date)
-            .execute("updateUser");
+            .input("start", mssql_1.default.VarChar, start)
+            .execute("updateTodo");
         res.status(200).json({
-            message: "User Successfully Updated",
+            message: "Todo Successfully Updated",
         });
     }
     catch (error) {
@@ -110,28 +113,34 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
 });
-exports.updateUser = updateUser;
-const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.updateTodo = updateTodo;
+const deleteTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
         let pool = yield mssql_1.default.connect(config_1.default);
-        const user = yield pool
+        const todo = yield pool
             .request()
             .input("id", mssql_1.default.VarChar, id)
-            .execute("getSingleUser");
-        if (!user.recordset[0]) {
+            .execute("getTodo");
+        if (!todo.recordset[0]) {
             res.json({
-                message: `No user ${id} exist!`,
+                message: `No Todo ${id} exist!`,
             });
         }
-        yield pool.request().input("id", mssql_1.default.VarChar, id).execute("deleteUser");
+        yield pool.request().input("id", mssql_1.default.VarChar, id).execute("deleteTodo");
         res.status(200).json({
             status: "Successfully",
-            message: "User successfully deteled",
+            message: "Todo successfully deteled",
         });
     }
     catch (error) {
         res.json({ error: error.message });
     }
 });
-exports.deleteUser = deleteUser;
+exports.deleteTodo = deleteTodo;
+// export const isComplete: RequestHandler<{ id: string }> = (req, res) => {
+//   try {
+//   } catch (error: any) {
+//     res.json({ error: error.message });
+//   }
+// };

@@ -4,9 +4,10 @@ import mssql from "mssql";
 import config from "../config/config";
 import { Registerschema } from "../models/use-model";
 
-export const createUser = async (req: Request, res: Response) => {
+export const createTodo = async (req: Request, res: Response) => {
   try {
     const id = uid();
+    const start = "start";
     const { title, description, date } = req.body as {
       title: string;
       description: string;
@@ -25,7 +26,8 @@ export const createUser = async (req: Request, res: Response) => {
       .input("title", mssql.VarChar, title)
       .input("description", mssql.VarChar, description)
       .input("date", mssql.VarChar, date)
-      .execute("insertUser");
+      .input("start", mssql.VarChar, start)
+      .execute("insertTodo");
     res.status(200).json({
       message: "User Created Successfully",
     });
@@ -34,61 +36,59 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getUsers: RequestHandler = async (req, res) => {
+export const getTodos: RequestHandler = async (req, res) => {
   try {
     let pool = await mssql.connect(config);
-    const users = await pool.request().execute("getUsers");
+    const todos = await pool.request().execute("getTodos");
     res.status(200).json({
       status: "Success",
-      data: users.recordset,
+      data: todos.recordset,
     });
   } catch (error: any) {
     res.json({ error: error.message });
   }
 };
 
-export const getSingleUser: RequestHandler<{ id: string }> = async (
-  req,
-  res
-) => {
+export const getTodo: RequestHandler<{ id: string }> = async (req, res) => {
   try {
     const id = req.params.id;
     let pool = await mssql.connect(config);
-    const user = await pool
+    const todo = await pool
       .request()
       .input("id", mssql.VarChar, id)
-      .execute("getSingleUser");
-    if (!user.recordset[0]) {
+      .execute("getTodo");
+    if (!todo.recordset[0]) {
       return res.json({
-        message: `No user with ${id}`,
+        message: `No todo with ${id}`,
       });
     }
     res.status(200).json({
       message: "Success",
-      data: user.recordset,
+      data: todo.recordset,
     });
   } catch (error: any) {
     res.json({ error: error.message });
   }
 };
 
-export const updateUser: RequestHandler<{ id: string }> = async (req, res) => {
+export const updateTodo: RequestHandler<{ id: string }> = async (req, res) => {
   try {
     const id = req.params.id;
     let pool = await mssql.connect(config);
-    const { title, description, date } = req.body as {
+    const { title, description, date, start } = req.body as {
       title: string;
       description: string;
       date: string;
+      start: string;
     };
-    const user = await pool
+    const todo = await pool
       .request()
       .input("id", mssql.VarChar, id)
-      .execute("getSingleUser");
+      .execute("getTodo");
 
-    if (!user.recordset[0]) {
+    if (!todo.recordset[0]) {
       res.json({
-        message: `No user with ${id}`,
+        message: `No Todo with ${id}`,
       });
     }
     await pool
@@ -97,10 +97,11 @@ export const updateUser: RequestHandler<{ id: string }> = async (req, res) => {
       .input("title", mssql.VarChar, title)
       .input("description", mssql.VarChar, description)
       .input("date", mssql.VarChar, date)
-      .execute("updateUser");
+      .input("start", mssql.VarChar, start)
+      .execute("updateTodo");
 
     res.status(200).json({
-      message: "User Successfully Updated",
+      message: "Todo Successfully Updated",
     });
   } catch (error: any) {
     res.json({
@@ -113,26 +114,33 @@ interface RequestExtended extends Request {
   users?: any;
 }
 
-export const deleteUser = async (req: RequestExtended, res: Response) => {
+export const deleteTodo = async (req: RequestExtended, res: Response) => {
   try {
     const id = req.params.id;
     let pool = await mssql.connect(config);
-    const user = await pool
+    const todo = await pool
       .request()
       .input("id", mssql.VarChar, id)
-      .execute("getSingleUser");
-    if (!user.recordset[0]) {
+      .execute("getTodo");
+    if (!todo.recordset[0]) {
       res.json({
-        message: `No user ${id} exist!`,
+        message: `No Todo ${id} exist!`,
       });
     }
-    await pool.request().input("id", mssql.VarChar, id).execute("deleteUser");
+    await pool.request().input("id", mssql.VarChar, id).execute("deleteTodo");
 
     res.status(200).json({
       status: "Successfully",
-      message: "User successfully deteled",
+      message: "Todo successfully deteled",
     });
   } catch (error: any) {
     res.json({ error: error.message });
   }
 };
+
+// export const isComplete: RequestHandler<{ id: string }> = (req, res) => {
+//   try {
+//   } catch (error: any) {
+//     res.json({ error: error.message });
+//   }
+// };
