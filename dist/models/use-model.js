@@ -7,6 +7,6 @@ exports.Registerschema = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.Registerschema = joi_1.default.object({
     title: joi_1.default.string().required(),
-    description: joi_1.default.string().min(0).max(100).required(),
+    description: joi_1.default.string().min(0).max(50).required(),
     date: joi_1.default.string().required(),
 });
